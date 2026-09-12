@@ -1,0 +1,575 @@
+[
+  {
+    "name": "weekly-count",
+    "from": "2026-01-01",
+    "to": "2026-04-01",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": false,
+        "startDate": "2026-01-01",
+        "startTime": "10:00",
+        "durationMinutes": 60,
+        "repeat": {
+          "frequency": "weekly",
+          "interval": 2,
+          "weekdays": [
+            0,
+            1,
+            4
+          ],
+          "count": 9
+        },
+        "exceptions": {}
+      }
+    ],
+    "expected": [
+      {
+        "id": "local:fixture:2026-01-01",
+        "title": "Собрание",
+        "start": "2026-01-01T07:00:00.000Z",
+        "end": "2026-01-01T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-01"
+      },
+      {
+        "id": "local:fixture:2026-01-04",
+        "title": "Собрание",
+        "start": "2026-01-04T07:00:00.000Z",
+        "end": "2026-01-04T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-04"
+      },
+      {
+        "id": "local:fixture:2026-01-12",
+        "title": "Собрание",
+        "start": "2026-01-12T07:00:00.000Z",
+        "end": "2026-01-12T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-12"
+      },
+      {
+        "id": "local:fixture:2026-01-15",
+        "title": "Собрание",
+        "start": "2026-01-15T07:00:00.000Z",
+        "end": "2026-01-15T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-15"
+      },
+      {
+        "id": "local:fixture:2026-01-18",
+        "title": "Собрание",
+        "start": "2026-01-18T07:00:00.000Z",
+        "end": "2026-01-18T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-18"
+      },
+      {
+        "id": "local:fixture:2026-01-26",
+        "title": "Собрание",
+        "start": "2026-01-26T07:00:00.000Z",
+        "end": "2026-01-26T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-26"
+      },
+      {
+        "id": "local:fixture:2026-01-29",
+        "title": "Собрание",
+        "start": "2026-01-29T07:00:00.000Z",
+        "end": "2026-01-29T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-29"
+      },
+      {
+        "id": "local:fixture:2026-02-01",
+        "title": "Собрание",
+        "start": "2026-02-01T07:00:00.000Z",
+        "end": "2026-02-01T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-02-01"
+      },
+      {
+        "id": "local:fixture:2026-02-09",
+        "title": "Собрание",
+        "start": "2026-02-09T07:00:00.000Z",
+        "end": "2026-02-09T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-02-09"
+      }
+    ]
+  },
+  {
+    "name": "monthly-31",
+    "from": "2026-01-01",
+    "to": "2027-01-01",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": false,
+        "startDate": "2026-01-31",
+        "startTime": "10:00",
+        "durationMinutes": 60,
+        "repeat": {
+          "frequency": "monthly",
+          "interval": 1,
+          "count": 6
+        },
+        "exceptions": {}
+      }
+    ],
+    "expected": [
+      {
+        "id": "local:fixture:2026-01-31",
+        "title": "Собрание",
+        "start": "2026-01-31T07:00:00.000Z",
+        "end": "2026-01-31T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-31"
+      },
+      {
+        "id": "local:fixture:2026-03-31",
+        "title": "Собрание",
+        "start": "2026-03-31T07:00:00.000Z",
+        "end": "2026-03-31T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-03-31"
+      },
+      {
+        "id": "local:fixture:2026-05-31",
+        "title": "Собрание",
+        "start": "2026-05-31T07:00:00.000Z",
+        "end": "2026-05-31T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-05-31"
+      },
+      {
+        "id": "local:fixture:2026-07-31",
+        "title": "Собрание",
+        "start": "2026-07-31T07:00:00.000Z",
+        "end": "2026-07-31T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-07-31"
+      },
+      {
+        "id": "local:fixture:2026-08-31",
+        "title": "Собрание",
+        "start": "2026-08-31T07:00:00.000Z",
+        "end": "2026-08-31T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-08-31"
+      },
+      {
+        "id": "local:fixture:2026-10-31",
+        "title": "Собрание",
+        "start": "2026-10-31T07:00:00.000Z",
+        "end": "2026-10-31T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-10-31"
+      }
+    ]
+  },
+  {
+    "name": "last-weekday",
+    "from": "2026-01-01",
+    "to": "2027-01-01",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": false,
+        "startDate": "2026-01-30",
+        "startTime": "10:00",
+        "durationMinutes": 60,
+        "repeat": {
+          "frequency": "monthly",
+          "interval": 1,
+          "monthlyMode": "weekday"
+        },
+        "exceptions": {}
+      }
+    ],
+    "expected": [
+      {
+        "id": "local:fixture:2026-01-30",
+        "title": "Собрание",
+        "start": "2026-01-30T07:00:00.000Z",
+        "end": "2026-01-30T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-30"
+      },
+      {
+        "id": "local:fixture:2026-02-27",
+        "title": "Собрание",
+        "start": "2026-02-27T07:00:00.000Z",
+        "end": "2026-02-27T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-02-27"
+      },
+      {
+        "id": "local:fixture:2026-03-27",
+        "title": "Собрание",
+        "start": "2026-03-27T07:00:00.000Z",
+        "end": "2026-03-27T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-03-27"
+      },
+      {
+        "id": "local:fixture:2026-04-24",
+        "title": "Собрание",
+        "start": "2026-04-24T07:00:00.000Z",
+        "end": "2026-04-24T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-04-24"
+      },
+      {
+        "id": "local:fixture:2026-05-29",
+        "title": "Собрание",
+        "start": "2026-05-29T07:00:00.000Z",
+        "end": "2026-05-29T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-05-29"
+      },
+      {
+        "id": "local:fixture:2026-06-26",
+        "title": "Собрание",
+        "start": "2026-06-26T07:00:00.000Z",
+        "end": "2026-06-26T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-06-26"
+      },
+      {
+        "id": "local:fixture:2026-07-31",
+        "title": "Собрание",
+        "start": "2026-07-31T07:00:00.000Z",
+        "end": "2026-07-31T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-07-31"
+      },
+      {
+        "id": "local:fixture:2026-08-28",
+        "title": "Собрание",
+        "start": "2026-08-28T07:00:00.000Z",
+        "end": "2026-08-28T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-08-28"
+      },
+      {
+        "id": "local:fixture:2026-09-25",
+        "title": "Собрание",
+        "start": "2026-09-25T07:00:00.000Z",
+        "end": "2026-09-25T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-09-25"
+      },
+      {
+        "id": "local:fixture:2026-10-30",
+        "title": "Собрание",
+        "start": "2026-10-30T07:00:00.000Z",
+        "end": "2026-10-30T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-10-30"
+      },
+      {
+        "id": "local:fixture:2026-11-27",
+        "title": "Собрание",
+        "start": "2026-11-27T07:00:00.000Z",
+        "end": "2026-11-27T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-11-27"
+      },
+      {
+        "id": "local:fixture:2026-12-25",
+        "title": "Собрание",
+        "start": "2026-12-25T07:00:00.000Z",
+        "end": "2026-12-25T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-12-25"
+      }
+    ]
+  },
+  {
+    "name": "second-weekday",
+    "from": "2026-01-01",
+    "to": "2027-01-01",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": false,
+        "startDate": "2026-01-12",
+        "startTime": "10:00",
+        "durationMinutes": 60,
+        "repeat": {
+          "frequency": "monthly",
+          "interval": 2,
+          "monthlyMode": "weekday"
+        },
+        "exceptions": {}
+      }
+    ],
+    "expected": [
+      {
+        "id": "local:fixture:2026-01-12",
+        "title": "Собрание",
+        "start": "2026-01-12T07:00:00.000Z",
+        "end": "2026-01-12T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-12"
+      },
+      {
+        "id": "local:fixture:2026-03-09",
+        "title": "Собрание",
+        "start": "2026-03-09T07:00:00.000Z",
+        "end": "2026-03-09T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-03-09"
+      },
+      {
+        "id": "local:fixture:2026-05-11",
+        "title": "Собрание",
+        "start": "2026-05-11T07:00:00.000Z",
+        "end": "2026-05-11T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-05-11"
+      },
+      {
+        "id": "local:fixture:2026-07-13",
+        "title": "Собрание",
+        "start": "2026-07-13T07:00:00.000Z",
+        "end": "2026-07-13T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-07-13"
+      },
+      {
+        "id": "local:fixture:2026-09-14",
+        "title": "Собрание",
+        "start": "2026-09-14T07:00:00.000Z",
+        "end": "2026-09-14T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-09-14"
+      },
+      {
+        "id": "local:fixture:2026-11-09",
+        "title": "Собрание",
+        "start": "2026-11-09T07:00:00.000Z",
+        "end": "2026-11-09T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-11-09"
+      }
+    ]
+  },
+  {
+    "name": "leap-birthday",
+    "from": "2028-01-01",
+    "to": "2029-01-01",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": true,
+        "startDate": "2024-02-29",
+        "startTime": "00:00",
+        "durationMinutes": 1440,
+        "repeat": {
+          "frequency": "yearly",
+          "interval": 1,
+          "count": 2
+        },
+        "exceptions": {}
+      }
+    ],
+    "expected": [
+      {
+        "id": "local:fixture:2028-02-29",
+        "title": "Собрание",
+        "start": "2028-02-28T21:00:00.000Z",
+        "end": "2028-02-29T21:00:00.000Z",
+        "allDay": true,
+        "occurrenceDate": "2028-02-29"
+      }
+    ]
+  },
+  {
+    "name": "until-crossing",
+    "from": "2026-02-01",
+    "to": "2026-03-01",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": false,
+        "startDate": "2026-01-30",
+        "startTime": "23:45",
+        "durationMinutes": 90,
+        "repeat": {
+          "frequency": "daily",
+          "interval": 2,
+          "until": "2026-02-04"
+        },
+        "exceptions": {}
+      }
+    ],
+    "expected": [
+      {
+        "id": "local:fixture:2026-02-01",
+        "title": "Собрание",
+        "start": "2026-02-01T20:45:00.000Z",
+        "end": "2026-02-01T22:15:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-02-01"
+      },
+      {
+        "id": "local:fixture:2026-02-03",
+        "title": "Собрание",
+        "start": "2026-02-03T20:45:00.000Z",
+        "end": "2026-02-03T22:15:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-02-03"
+      }
+    ]
+  },
+  {
+    "name": "exceptions",
+    "from": "2026-02-01",
+    "to": "2026-03-01",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": false,
+        "startDate": "2026-01-01",
+        "startTime": "10:00",
+        "durationMinutes": 60,
+        "repeat": {
+          "frequency": "weekly",
+          "interval": 1
+        },
+        "exceptions": {
+          "2026-01-01": {
+            "startDate": "2026-02-02",
+            "title": "Перенесено"
+          },
+          "2026-02-05": {
+            "cancelled": true
+          },
+          "2026-02-12": {
+            "startDate": "2026-04-01"
+          },
+          "2026-02-19": {
+            "startTime": "21:00",
+            "durationMinutes": 180
+          },
+          "2026-01-02": {
+            "startDate": "2026-02-07"
+          }
+        }
+      }
+    ],
+    "expected": [
+      {
+        "id": "local:fixture:2026-01-01",
+        "title": "Перенесено",
+        "start": "2026-02-02T07:00:00.000Z",
+        "end": "2026-02-02T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-01-01"
+      },
+      {
+        "id": "local:fixture:2026-02-19",
+        "title": "Собрание",
+        "start": "2026-02-19T18:00:00.000Z",
+        "end": "2026-02-19T21:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-02-19"
+      },
+      {
+        "id": "local:fixture:2026-02-26",
+        "title": "Собрание",
+        "start": "2026-02-26T07:00:00.000Z",
+        "end": "2026-02-26T08:00:00.000Z",
+        "allDay": false,
+        "occurrenceDate": "2026-02-26"
+      }
+    ]
+  },
+  {
+    "name": "all-day-overlap",
+    "from": "2026-02-01",
+    "to": "2026-02-04",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": true,
+        "startDate": "2026-01-31",
+        "startTime": "00:00",
+        "durationMinutes": 2880,
+        "repeat": {
+          "frequency": "none",
+          "interval": 1
+        },
+        "exceptions": {}
+      }
+    ],
+    "expected": [
+      {
+        "id": "local:fixture:2026-01-31",
+        "title": "Собрание",
+        "start": "2026-01-30T21:00:00.000Z",
+        "end": "2026-02-01T21:00:00.000Z",
+        "allDay": true,
+        "occurrenceDate": "2026-01-31"
+      }
+    ]
+  },
+  {
+    "name": "boundary-exclusive",
+    "from": "2026-02-01",
+    "to": "2026-02-02",
+    "series": [
+      {
+        "id": "fixture",
+        "title": "Собрание",
+        "notes": "",
+        "location": "",
+        "tags": [],
+        "allDay": false,
+        "startDate": "2026-01-31",
+        "startTime": "23:00",
+        "durationMinutes": 60,
+        "repeat": {
+          "frequency": "none",
+          "interval": 1
+        },
+        "exceptions": {}
+      }
+    ],
+    "expected": []
+  }
+]
