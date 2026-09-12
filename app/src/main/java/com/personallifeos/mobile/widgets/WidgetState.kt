@@ -18,6 +18,7 @@ object WidgetState {
     val FILTER_LABEL = stringPreferencesKey("filter_label")
     val MONTH_YEAR = longPreferencesKey("month_year")
     val MONTH_MONTH = longPreferencesKey("month_month")
+    val DAY_DATE = stringPreferencesKey("day_date")
     val SEEN = booleanPreferencesKey("seen")
 
     const val ALL = "__all__"
@@ -30,6 +31,19 @@ object WidgetState {
         val year = prefs[MONTH_YEAR]?.toInt() ?: today.year
         val month = prefs[MONTH_MONTH]?.toInt()?.coerceIn(1, 12) ?: today.monthValue
         return LocalDate.of(year, month, 1)
+    }
+
+    fun day(prefs: Preferences, today: LocalDate = LocalDate.now(CalendarProjection.zone)): LocalDate =
+        prefs[DAY_DATE]?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: today
+
+    /** No pinned date means the widget follows today as the cached view refreshes. */
+    suspend fun setDay(context: Context, id: GlanceId, date: LocalDate?) {
+        updateAppWidgetState(context, PreferencesGlanceStateDefinition, id) { prefs ->
+            prefs.toMutablePreferences().apply {
+                if (date == null) remove(DAY_DATE) else this[DAY_DATE] = date.toString()
+                this[SEEN] = true
+            }
+        }
     }
 
     suspend fun setFilter(

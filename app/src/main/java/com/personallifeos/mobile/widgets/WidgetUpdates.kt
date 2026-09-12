@@ -9,6 +9,7 @@ object WidgetUpdates {
         val manager = GlanceAppWidgetManager(context)
         refresh(manager, context, InboxWidget())
         refresh(manager, context, AgendaWidget())
+        refresh(manager, context, DayWidget())
         refresh(manager, context, MonthWidget())
     }
 

@@ -49,6 +49,7 @@ data class DeepLink(
     val captureBoardId: String? = null,
     val captureColumnId: String? = null,
     val requestId: Long = 0L,
+    val time: String? = null,
 ) {
     companion object {
         fun fromIntent(intent: android.content.Intent?, requestId: Long = 0L): DeepLink = DeepLink(
@@ -58,6 +59,9 @@ data class DeepLink(
             captureBoardId = intent?.getStringExtra("captureBoardId"),
             captureColumnId = intent?.getStringExtra("captureColumnId"),
             requestId = requestId,
+            time = intent?.getStringExtra("time")?.let { value ->
+                runCatching { java.time.LocalTime.parse(value).toString() }.getOrNull()
+            },
         )
     }
 }

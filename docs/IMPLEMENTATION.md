@@ -26,16 +26,22 @@ After enqueue/connection call `work.SyncScheduler.enqueue(context)`; after persi
 
 ## Widgets (widgets worker owns widgets/ and res/xml+res/drawable widget files only)
 
-`widgets.WidgetUpdates.update(context)` suspend updates all three providers. `InboxWidgetReceiver`, `AgendaWidgetReceiver`, `MonthWidgetReceiver` (Glance1.1.1), `WidgetConfigActivity` for Inbox/board/list filtering by appWidgetId. Root registers activities/receivers. Use `data.LifeRepository.get(context).snapshot()` and CalendarProjection. Complete callback queues Actions.complete and immediately updates cached view; network handled by WorkManager.
+`widgets.WidgetUpdates.update(context)` suspend updates all four providers. `InboxWidgetReceiver`, `AgendaWidgetReceiver`, `DayWidgetReceiver`, `MonthWidgetReceiver` (Glance1.1.1), `WidgetConfigActivity` for Inbox/board/list filtering by appWidgetId. Root registers activities/receivers. Use `data.LifeRepository.get(context).snapshot()` and CalendarProjection. Complete callback queues Actions.complete and immediately updates cached view; network handled by WorkManager.
 
-Deep links use explicit `ui.MainActivity` intents with extras: `screen` = inbox/calendar/settings/capture/task/event, `id` optional, `date` ISO LocalDate optional. MainActivity singleTop handles onNewIntent. Capture/widget/calendar controls may launch the app's compact sheet. No text input inside RemoteViews.
+Deep links use explicit `ui.MainActivity` intents with extras: `screen` = inbox/calendar/calendar_day/settings/capture/task/event/event_create, `id` optional, `date` ISO LocalDate optional, `time` optional HH:mm for event creation. `calendar_day` explicitly opens the hourly view even when another calendar mode was selected. MainActivity singleTop handles onNewIntent. Capture/widget/calendar controls may launch the app's compact sheet. No text input inside RemoteViews.
 
-Widget XML names: widget_inbox_info, widget_agenda_info, widget_month_info. Widgets resizable width/height, header+add+refresh, compact wrap-aware list, accessible touch targets, daily list and month grid with navigation/today/dots. Per-instance preferences; remember month independent between instances. Data cached offline, no fake success when pending/blocked. Empty/auth/error states actionable. Avoid Google/Trello logos, use same layout/function patterns with Life OS identity.
+Widget XML names: widget_inbox_info, widget_agenda_info, widget_day_info, widget_month_info. Widgets resizable width/height, header+add+refresh, compact wrap-aware list, accessible touch targets, daily list and month grid with navigation/today/dots. Per-instance preferences; remember month independent between instances. Data cached offline, no fake success when pending/blocked. Empty/auth/error states actionable. Avoid Google/Trello logos, use same layout/function patterns with Life OS identity.
 
 ## App UI (UI worker owns ui/ only)
 
-`ui.MainActivity` is launcher/singleTop entry, Compose Material3. Screens Inbox/calendar/settings; password login (default service https://personal-life-os.51-250-78-132.sslip.io), alternative token in collapsed advanced settings. Collect repository snapshots. Fast capture sheet; task detail/edit/complete/move/schedule; agenda/month selection and event detail, event creation via eventCreate; imported event read-only; pin widget buttons in settings using AppWidgetManager requestPinAppWidget for three receiver classes. Settings queue/error/retry, disconnect with explicit pending guard. Compact UI Russian labels, indigo blue, dark/light/system theme, 48dp touch targets but dense rows. No embedded WebView shell.
+`ui.MainActivity` is launcher/singleTop entry, Compose Material3. Screens Inbox/calendar/settings; password login (default service https://personal-life-os.51-250-78-132.sslip.io), alternative token in collapsed advanced settings. Collect repository snapshots. Fast capture sheet; task detail/edit/complete/move/schedule; day/agenda/month selection and event detail, event creation via eventCreate; imported event read-only; pin widget buttons in settings using AppWidgetManager requestPinAppWidget for four receiver classes. Settings queue/error/retry, disconnect with explicit pending guard. Compact UI Russian labels, indigo blue, dark/light/system theme, 48dp touch targets but dense rows. No embedded WebView shell.
 
 ## Testing
 
 Domain/JVM tests with fake data; HTTP via MockWebServer; actual server tests READ ONLY only using credentials outside repo. No production tasks/events/test tokens created automatically. User credentials entered at device setup. Root will build/install APK and test with isolated fixture backend/emulator if available. No browser opening without explicit permission.
+
+## Day timeline
+
+`DayTimelineLayout.layout(date, items)` is shared by Compose and Glance. It separates all-day items, clips timed intervals to the local day, and assigns side-by-side lanes to connected overlap groups. End times are exclusive, so back-to-back events do not overlap. Geometry uses minutes 0–1440 in the service timezone.
+
+The day widget keeps its selected date per instance; Today clears the pinned date so later refreshes follow the current day. Event and empty-time actions use existing detail/create routes and the durable optimistic outbox. Layout and navigation do not mutate calendar events.

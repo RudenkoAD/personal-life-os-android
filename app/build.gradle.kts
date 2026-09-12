@@ -14,8 +14,8 @@ android {
         applicationId = "com.personallifeos.mobile"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = providers.gradleProperty("lifeOsVersionCode").orNull?.toInt() ?: 3
+        versionName = providers.gradleProperty("lifeOsVersionName").orNull ?: "0.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

@@ -26,6 +26,7 @@ fun openMain(
     date: String? = null,
     boardId: String? = null,
     columnId: String? = null,
+    time: String? = null,
 ): Intent =
     Intent(context, MainActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -34,6 +35,7 @@ fun openMain(
         date?.let { putExtra("date", it) }
         boardId?.let { putExtra("captureBoardId", it) }
         columnId?.let { putExtra("captureColumnId", it) }
+        time?.let { putExtra("time", it) }
     }
 
 fun openMainAction(
@@ -43,7 +45,8 @@ fun openMainAction(
     date: String? = null,
     boardId: String? = null,
     columnId: String? = null,
-): Action = actionStartActivity(openMain(context, screen, id, date, boardId, columnId))
+    time: String? = null,
+): Action = actionStartActivity(openMain(context, screen, id, date, boardId, columnId, time))
 
 class CompleteCardAction : ActionCallback {
     override suspend fun onAction(

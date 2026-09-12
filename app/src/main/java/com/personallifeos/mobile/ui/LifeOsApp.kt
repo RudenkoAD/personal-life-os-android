@@ -81,6 +81,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -103,6 +104,7 @@ import com.personallifeos.mobile.model.Card
 import com.personallifeos.mobile.model.CardType
 import com.personallifeos.mobile.model.LifeState
 import com.personallifeos.mobile.model.Placement
+import com.personallifeos.mobile.updates.AppUpdateManager
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -158,7 +160,7 @@ private fun LifeOsContent(
     }
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
-    var screen by rememberSaveable { mutableStateOf(if (deepLink.screen in setOf("calendar", "settings")) deepLink.screen else "inbox") }
+    var screen by rememberSaveable { mutableStateOf(if (deepLink.screen == "settings") "settings" else if (deepLink.screen in setOf("calendar", "calendar_day")) "calendar" else "inbox") }
     var selectedDate by rememberSaveable { mutableStateOf(deepLink.date ?: LocalDate.now(CalendarProjection.zone).toString()) }
     var selectedId by rememberSaveable { mutableStateOf(deepLink.id) }
     var sheet by rememberSaveable { mutableStateOf(if (deepLink.screen == "capture") "capture" else "") }
@@ -170,10 +172,21 @@ private fun LifeOsContent(
     var taskEditor by remember { mutableStateOf<Card?>(null) }
     var eventEditor by remember { mutableStateOf<CalendarItem?>(null) }
     var createEvent by rememberSaveable { mutableStateOf(deepLink.screen == "event_create") }
+    var dayModeRequestId by rememberSaveable { mutableLongStateOf(if (deepLink.screen == "calendar_day") deepLink.requestId else 0L) }
+    var createEventTime by rememberSaveable { mutableStateOf<String?>(deepLink.time) }
+    val calendarState = rememberSaveableStateHolder()
     val localDate = parseDate(selectedDate)
 
     LaunchedEffect(deepLink) {
-        if (deepLink.screen in setOf("inbox", "calendar", "settings")) screen = deepLink.screen
+        taskEditor = null
+        eventEditor = null
+        createEvent = false
+        sheet = ""
+        createEventTime = null
+        if (deepLink.screen in setOf("inbox", "calendar", "settings")) {
+            screen = deepLink.screen
+        }
+        if (deepLink.screen == "calendar_day") { screen = "calendar"; dayModeRequestId = deepLink.requestId }
         if (deepLink.screen == "inbox") {
             inboxBoardId = deepLink.captureBoardId
             inboxColumnId = deepLink.captureColumnId
@@ -181,6 +194,7 @@ private fun LifeOsContent(
         if (deepLink.screen == "event_create") {
             screen = "calendar"
             createEvent = true
+            createEventTime = deepLink.time
         }
         deepLink.date?.let { selectedDate = it }
         deepLink.id?.let { selectedId = it }
@@ -251,11 +265,11 @@ private fun LifeOsContent(
                 taskEditor != null -> TaskEditor(taskEditor!!, state ?: LifeState(), repository, submit, { taskEditor = null })
                 eventEditor != null -> EventDetail(eventEditor!!)
                 state == null -> LoadingState()
-                screen == "calendar" -> CalendarScreen(state, localDate, { selectedDate = it.toString() }, { item ->
+                screen == "calendar" -> calendarState.SaveableStateProvider("calendar") { CalendarScreen(state, localDate, dayModeRequestId, { selectedDate = it.toString() }, { item ->
                     selectedId = item.id
                     if (item.cardId != null) taskEditor = state.cards.firstOrNull { card -> card.id == item.cardId }
                     else eventEditor = item
-                }, { createEvent = true })
+                }, { date, time -> selectedDate = date.toString(); createEventTime = time.toString(); createEvent = true }) }
                 screen == "settings" -> SettingsScreen(repository, snapshot, themeMode, setThemeMode)
                 else -> InboxScreen(state, snapshot, inboxBoardId, inboxColumnId, { inboxBoardId = null; inboxColumnId = null }, { card -> selectedId = card.id; taskEditor = card }, enqueue, repository)
             }
@@ -282,9 +296,11 @@ private fun LifeOsContent(
             }
         }
     }
-    if (createEvent) EventCreateDialog(parseDate(selectedDate), { createEvent = false }) { title, date, time, duration, allDay ->
-        scope.launch {
-            if (submit { repository.enqueue(Actions.eventCreate(title, date, time, duration, allDay)) }) createEvent = false
+    if (createEvent) androidx.compose.runtime.key(deepLink.requestId) {
+        EventCreateDialog(parseDate(selectedDate), createEventTime?.let(::parseTime), { createEvent = false; createEventTime = null }) { title, date, time, duration, allDay ->
+            scope.launch {
+                if (submit { repository.enqueue(Actions.eventCreate(title, date, time, duration, allDay)) }) { createEvent = false; createEventTime = null }
+            }
         }
     }
 }
@@ -452,22 +468,36 @@ private fun TaskEditor(card: Card, state: LifeState, repository: LifeRepository,
 }
 
 @Composable
-private fun CalendarScreen(state: LifeState, date: LocalDate, selectDate: (LocalDate) -> Unit, open: (CalendarItem) -> Unit, create: () -> Unit) {
+private fun CalendarScreen(state: LifeState, date: LocalDate, dayModeRequestId: Long, selectDate: (LocalDate) -> Unit, open: (CalendarItem) -> Unit, create: (LocalDate, LocalTime) -> Unit) {
     var month by rememberSaveable(date.year, date.monthValue) { mutableStateOf(date.withDayOfMonth(1)) }
-    var mode by rememberSaveable { mutableStateOf("agenda") }
+    var mode by rememberSaveable { mutableStateOf("day") }
+    var dayScrollRequest by rememberSaveable { mutableIntStateOf(0) }
+    var consumedDayRequest by rememberSaveable { mutableLongStateOf(0L) }
+    LaunchedEffect(dayModeRequestId) {
+        if (dayModeRequestId > 0L && dayModeRequestId != consumedDayRequest) {
+            mode = "day"
+            consumedDayRequest = dayModeRequestId
+        }
+    }
     val from = if (mode == "month") month.withDayOfMonth(1).minusDays(7) else date
     val to = if (mode == "month") month.withDayOfMonth(1).plusMonths(1).plusDays(7) else date.plusDays(1)
     val items = CalendarProjection.items(state, from, to)
     Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-            FilterChip(mode == "agenda", { mode = "agenda" }, label = { Text("День") })
-            FilterChip(mode == "month", { mode = "month" }, label = { Text("Месяц") })
-            Spacer(Modifier.weight(1f))
-            IconButton(onClick = { if (mode == "month") month = month.minusMonths(1) else selectDate(date.minusDays(1)) }) { Icon(Icons.Default.ArrowBack, "Назад") }
-            Text(if (mode == "month") month.format(DateTimeFormatter.ofPattern("LLLL yyyy")) else date.format(DateTimeFormatter.ofPattern("d MMMM")), style = MaterialTheme.typography.titleSmall)
-            IconButton(onClick = { if (mode == "month") month = month.plusMonths(1) else selectDate(date.plusDays(1)) }) { Icon(Icons.Default.ArrowForward, "Вперёд") }
+        Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 3.dp)) {
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                FilterChip(mode == "day", { mode = "day" }, label = { Text("День") })
+                FilterChip(mode == "agenda", { mode = "agenda" }, label = { Text("Расписание") })
+                FilterChip(mode == "month", { mode = "month" }, label = { Text("Месяц") })
+            }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { if (mode == "month") month = month.minusMonths(1) else selectDate(date.minusDays(1)) }) { Icon(Icons.Default.ArrowBack, "Назад") }
+                Text(if (mode == "month") month.format(DateTimeFormatter.ofPattern("LLLL yyyy", java.util.Locale.forLanguageTag("ru"))) else date.format(DateTimeFormatter.ofPattern("d MMMM", java.util.Locale.forLanguageTag("ru"))), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                IconButton(onClick = { if (mode == "month") month = month.plusMonths(1) else selectDate(date.plusDays(1)) }) { Icon(Icons.Default.ArrowForward, "Вперёд") }
+                if (mode == "day") TextButton(onClick = { selectDate(LocalDate.now(CalendarProjection.zone)); dayScrollRequest++ }) { Text("Сегодня") }
+            }
         }
-        if (mode == "month") MonthGrid(month, items, selectDate, open)
+        if (mode == "month") MonthGrid(month, items, { selectDate(it); mode = "day" }, open)
+        else if (mode == "day") DayCalendar(state, date, open, create, dayScrollRequest)
         else Agenda(date, items, open)
     }
 }
@@ -538,10 +568,10 @@ private fun CaptureSheet(close: () -> Unit, save: (String) -> Unit) {
 }
 
 @Composable
-private fun EventCreateDialog(initialDate: LocalDate, close: () -> Unit, save: (String, LocalDate, LocalTime, Int, Boolean) -> Unit) {
+private fun EventCreateDialog(initialDate: LocalDate, initialTime: LocalTime? = null, close: () -> Unit, save: (String, LocalDate, LocalTime, Int, Boolean) -> Unit) {
     var title by rememberSaveable { mutableStateOf("") }
     var date by rememberSaveable(initialDate.toString()) { mutableStateOf(initialDate.toString()) }
-    var time by rememberSaveable { mutableStateOf("09:00") }
+    var time by rememberSaveable(initialDate.toString(), initialTime?.toString()) { mutableStateOf(initialTime?.toString()?.take(5) ?: "09:00") }
     var duration by rememberSaveable { mutableIntStateOf(60) }
     var allDay by rememberSaveable { mutableStateOf(false) }
     var formError by rememberSaveable { mutableStateOf<String?>(null) }
@@ -565,7 +595,10 @@ private fun SettingsScreen(repository: LifeRepository, snapshot: MobileSnapshot,
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     var disconnectPrompt by remember { mutableStateOf(false) }
+    val updateManager = remember { AppUpdateManager.get(context) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        AppUpdateSection(updateManager, repository.baseUrl())
+        Divider()
         Text("Подключение", style = MaterialTheme.typography.titleMedium)
         Text(repository.baseUrl(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) { Text(if (snapshot.connected) "Онлайн" else "Отключено"); Text("${snapshot.pending} в очереди", style = MaterialTheme.typography.bodySmall) }
@@ -585,10 +618,15 @@ private fun SettingsScreen(repository: LifeRepository, snapshot: MobileSnapshot,
         Divider()
         Text("Виджеты", style = MaterialTheme.typography.titleMedium)
         Text("Добавьте нужные панели на главный экран", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            WidgetPinButton(context, "Входящие", "com.personallifeos.mobile.widgets.InboxWidgetReceiver")
-            WidgetPinButton(context, "День", "com.personallifeos.mobile.widgets.AgendaWidgetReceiver")
-            WidgetPinButton(context, "Месяц", "com.personallifeos.mobile.widgets.MonthWidgetReceiver")
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                WidgetPinButton(context, "Входящие", "com.personallifeos.mobile.widgets.InboxWidgetReceiver", Modifier.weight(1f))
+                WidgetPinButton(context, "День", "com.personallifeos.mobile.widgets.DayWidgetReceiver", Modifier.weight(1f))
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                WidgetPinButton(context, "Расписание", "com.personallifeos.mobile.widgets.AgendaWidgetReceiver", Modifier.weight(1f))
+                WidgetPinButton(context, "Месяц", "com.personallifeos.mobile.widgets.MonthWidgetReceiver", Modifier.weight(1f))
+            }
         }
     }
     if (disconnectPrompt) AlertDialog(
@@ -606,14 +644,14 @@ private fun SettingsScreen(repository: LifeRepository, snapshot: MobileSnapshot,
 }
 
 @Composable
-private fun WidgetPinButton(context: Context, label: String, receiverName: String) {
+private fun WidgetPinButton(context: Context, label: String, receiverName: String, modifier: Modifier = Modifier) {
     OutlinedButton(onClick = {
         runCatching {
             val receiver = Class.forName(receiverName)
             val info = AppWidgetManager.getInstance(context).installedProviders.firstOrNull { it.provider.packageName == context.packageName && it.provider.className == receiver.name }
             if (info != null && AppWidgetManager.getInstance(context).isRequestPinAppWidgetSupported) AppWidgetManager.getInstance(context).requestPinAppWidget(info.provider, null, null)
         }
-    }, modifier = Modifier.height(48.dp)) { Icon(Icons.Default.Widgets, null); Spacer(Modifier.width(4.dp)); Text(label) }
+    }, modifier = modifier.height(48.dp)) { Icon(Icons.Default.Widgets, null); Spacer(Modifier.width(4.dp)); Text(label, maxLines = 1) }
 }
 
 private fun parseDate(value: String): LocalDate = runCatching { LocalDate.parse(value) }.getOrElse { LocalDate.now(CalendarProjection.zone) }
